@@ -201,7 +201,7 @@ if __name__ == "__main__":
     time_2 = time()
 
 
-    moje_mieszkanie.heat_up(1)
+    moje_mieszkanie.heat_up(1) #wpisujemy liczbę godzin jako czas trwania symulacji ogrzewania
     time_3 = time()
     print(time_3 - time_2)
 
