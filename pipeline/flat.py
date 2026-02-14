@@ -1,8 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.sparse as sp
-from load_constants import load_constants
-from Diff_matrices import D2, D1_forward, D1_backward
+
+try:
+    from pipeline.load_constants import load_constants
+except ModuleNotFoundError:
+    from load_constants import load_constants
+
+try:
+    from pipeline.Diff_matrices import D2, D1_forward, D1_backward
+except ModuleNotFoundError:
+    from Diff_matrices import D2, D1_forward, D1_backward
 import os
 
 
@@ -12,11 +20,15 @@ class Flat:
     o rozmieszczeniu ścian, okien, drzwi i grzejników mieszkania. Liczy przede wszystkim
     średnią temperaturę, zużytą energię do ogrzania mieszkania i rozłożenie temperatury w mieszkaniu
     """
-    def __init__(self, flat_width, flat_length, flat_height,
+    def __init__(self, flat_width, flat_length,
                  goal_temp, init_temp,
                  north_out_temp, east_out_temp,
                  south_out_temp, west_out_temp, time_step):
-        path = os.path.join("data", "constants.csv")
+
+        # Pobiera ścieżkę do folderu 'pipeline' (tam gdzie jest flat.py)
+        base_path = os.path.dirname(__file__)
+        # Wychodzi poziom wyżej i wchodzi do 'data/constants.csv'
+        path = os.path.abspath(os.path.join(base_path, "..", "data", "constants.csv"))
         data = load_constants(path)
 
         # Potrzebne stałe
@@ -37,8 +49,9 @@ class Flat:
 
         self.lambda_air = self.air_movement_coeff * self.air_heat_coeff
 
-        self.radiators_heat_level = 0     # Poziom grzania grzejników (od 0 do 5)
-        self.average_temp = init_temp + self.K # Średnia temperatura w Kelwinach
+        self.radiators_heat_level = 0        # Poziom grzania grzejników (od 0 do 5)
+        self.init_temp = init_temp  + self.K # Zamiana na stopnie Kelwina
+        self.average_temp = self.init_temp   # Średnia temperatura w Kelwinach
 
         self.goal_temp = goal_temp + self.K           # Średnia temperatura docelowa mieszkania
         self.north_out_temp = north_out_temp + self.K # Temperatura na zewnątrz od strony ściany północnej
@@ -47,15 +60,13 @@ class Flat:
         self.west_out_temp = west_out_temp + self.K   # Temperatura na zewnątrz od strony ściany zachodniej
 
         # Tworzymy siatkę przedstawiającą temperaturę w mieszkaniu
-        self.H = flat_height
         self.x, self.y = np.arange(0, flat_width, self.hx), np.arange(0, flat_length, self.hx)
         self.Nx, self.Ny = len(self.x), len(self.y)
         self.X, self.Y = np.meshgrid(self.x, self.y)
 
         self.heat_sources = np.zeros(self.Nx * self.Ny)
-
-        self.current_temp = np.ones(self.X.shape)*(init_temp + self.K) # Początkowo zakładamy, że temperatura
-                                                                       # jest taka sama w całym mieszkaniu
+        self.current_temp = np.ones(self.X.shape) * self.init_temp  # Początkowo zakładamy, że temperatura
+                                                                    # jest taka sama w całym mieszkaniu
 
         # Znajdujemy indeksy brzegowe
         self.idx_north_wall = np.where(self.Y == self.y[0], True, False).flatten()
@@ -236,13 +247,13 @@ class Flat:
 
         # Wypisywanie danych
         average_temp = round(self.average_temp - self.K, 2)
-        print(f"Czas trwania symulacji dyfuzji: {T_total}")
-        print(f"Całkowita zużyta energia w trakcie symulacji dyfuzji: {total_kwh}")
-        print(f"Średnia temperatura po symulacji dyfuzji: {average_temp}")
 
-        return T_total, total_kwh, average_temp
+        return total_kwh, average_temp
 
 
+    def reset_heat(self):
+        self.current_temp = np.ones(self.X.shape) * self.init_temp
+        self.average_temp = self.init_temp
 
 
     def temp_plot(self):
