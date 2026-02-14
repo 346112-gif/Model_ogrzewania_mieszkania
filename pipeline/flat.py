@@ -15,7 +15,7 @@ class Flat:
     def __init__(self, flat_width, flat_length, flat_height,
                  goal_temp, init_temp,
                  north_out_temp, east_out_temp,
-                 south_out_temp, west_out_temp):
+                 south_out_temp, west_out_temp, time_step):
         path = os.path.join("data", "constants.csv")
         data = load_constants(path)
 
@@ -33,7 +33,7 @@ class Flat:
         self.P = data["P"] # Przyjęta moc grzejników (W)
 
         self.hx = 0.1  # Krok przestrzenny w metrach
-        self.ht = 10  # Krok czasowy w sekundach
+        self.ht = time_step  # Krok czasowy w sekundach
 
         self.lambda_air = self.air_movement_coeff * self.air_heat_coeff
 
@@ -109,6 +109,8 @@ class Flat:
             lambda_type = self.lambda_wall
         elif object_type == "drzwi":
             lambda_type = self.lambda_door
+        else:
+            raise ValueError("object_type has to be either 'wall' or 'door'")
 
         ratio = lambda_type / self.lambda_air
 
@@ -118,6 +120,8 @@ class Flat:
         elif placement == "horizontal":
             M = (self.Y >= dist_from_wall - thickness / 2) & (self.Y <= dist_from_wall + thickness / 2) & \
                 (self.X >= start) & (self.X <= end)
+        else:
+            raise ValueError("Placement has to be either 'vertical' or 'horizontal'")
 
         idx = M.flatten()
 
@@ -136,6 +140,8 @@ class Flat:
             M = (self.X == self.x[int(dist_from_wall / self.hx)]) & (self.Y >= start) & (self.Y <= end)
         elif placement == "horizontal":
             M = (self.Y == self.y[int(dist_from_wall / self.hx)]) & (self.X >= start) & (self.X <= end)
+        else:
+            raise ValueError("Placement has to be either 'vertical' or 'horizontal'")
 
         self.heat_sources[M.flatten()] = heat_gain
 
@@ -145,10 +151,12 @@ class Flat:
         """
         Dodaje okno lub drzwi na wybraną ścianę zewnętrzną. Działanie podobne do 'add_inner_object'.
         """
-        if object_type == "okno":
+        if object_type == "window":
             lambda_type = self.lambda_window
-        elif object_type == "drzwi":
+        elif object_type == "door":
             lambda_type = self.lambda_door
+        else:
+            raise ValueError("object_type has to be either 'window' or 'door'")
 
         if outer_wall == "north":
             M = np.where((self.Y == self.y[0]) & (self.X >= start) & (self.X <= end), True, False)
