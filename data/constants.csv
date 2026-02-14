@@ -1,0 +1,11 @@
+constant_name,value
+lambda_door,0.70
+lambda_wall,0.25
+lambda_window,0.60
+air_heat_coeff,0.025
+air_movement_coeff,320
+K,273.15
+r,287.05
+c,1005
+p,101325
+P,6885
