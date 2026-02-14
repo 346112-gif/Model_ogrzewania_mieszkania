@@ -246,33 +246,3 @@ class Flat:
                                  #(0, 0) jest u góry po lewej
         plt.show()
 
-
-if __name__ == "__main__":
-    moje_mieszkanie = Flat(6, 10, 2.5, 22, 22,
-                           19, 22, -5, 22)
-
-    moje_mieszkanie.add_outer_object("south", 2.6, 4.8, lambda_window)
-
-    moje_mieszkanie.add_outer_object("north", 4.6, 5.6, lambda_door)
-
-    moje_mieszkanie.add_radiator("horizontal", hx,
-                                 1, 2.6, 9.8)
-    moje_mieszkanie.add_radiator("vertical", hx,
-                                 3, 3.8, 3.8)
-
-    moje_mieszkanie.add_inner_object("horizontal", 4, 0.3,
-                                     0.2, 4, lambda_wall)
-    moje_mieszkanie.add_inner_object("vertical", 4, 0.2,
-                                     0.2, 4, lambda_wall)
-    moje_mieszkanie.add_inner_object("vertical", 4, 0.3,
-                                     1, 2, lambda_door)
-
-    moje_mieszkanie.change_radiators_heat_level(0)
-    moje_mieszkanie.heat_up(8)
-
-    moje_mieszkanie.temp_plot()
-
-    moje_mieszkanie.change_radiators_heat_level(5)
-    moje_mieszkanie.heat_up(8)
-
-    moje_mieszkanie.temp_plot()
