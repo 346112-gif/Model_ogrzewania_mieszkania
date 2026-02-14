@@ -1,12 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from time import time
+import scipy.sparse as sp
 
 """ Wypisujemy potrzebne stałe """
 lambda_door = 0.80
 lambda_wall = 0.30
 lambda_window = 0.90
-lambda_air = 3
+air_heat_coeff = 0.25
+air_movement_coeff = 12 # współczynnik symulujący ruch powietrza
+lambda_air = air_movement_coeff * air_heat_coeff
+
 r = 287.05 #Indywidualna stała gazowa dla suchego powietrza (J/(kg*K))
 c = 1005 #Ciepło właściwe powietrza przy stałym ciśnieniu (J/(kg*K))
 p = 101325 #ciśnienie atmosferyczne (Pa)
@@ -88,7 +92,7 @@ class Flat:
         self.radiators_heat_level = new_heat_level
 
     def add_inner_object(self, placement, dist_from_wall, start, end, lambda_type):
-        ratio = lambda_type / lambda_air
+        ratio = lambda_type / lambda_air / air_movement_coeff
 
         if placement == "vertical":
             M = (self.X == self.x[int(dist_from_wall / hx)]) & (self.Y >= start) & (self.Y <= end)
@@ -139,6 +143,7 @@ class Flat:
 
 
     def heat_up(self, T_total): #całkowity czas podawany w godzinach
+        A = sp.csr_matrix(self.A)
         u_current = self.current_temp.copy()
         u_current = u_current.flatten()
         T = int(T_total*3600)
@@ -153,7 +158,7 @@ class Flat:
             u_current += self.heat_sources * (self.radiators_heat_level / 5)
 
 
-            u_current = np.linalg.solve(self.A, u_current)
+            u_current = sp.linalg.spsolve(A, u_current)
 
         self.current_temp = u_current.reshape(self.Ny, self.Nx)
 
