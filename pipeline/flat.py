@@ -23,7 +23,7 @@ class Flat:
     def __init__(self, flat_width, flat_length,
                  goal_temp, init_temp,
                  north_out_temp, east_out_temp,
-                 south_out_temp, west_out_temp, time_step):
+                 south_out_temp, west_out_temp, time_step, space_step):
 
         # Pobiera ścieżkę do folderu 'pipeline' (tam gdzie jest flat.py)
         base_path = os.path.dirname(__file__)
@@ -43,7 +43,7 @@ class Flat:
         self.c = data["c"] # Ciepło właściwe powietrza przy stałym ciśnieniu (J/(kg*K))
         self.p = data["p"] # Ciśnienie atmosferyczne (Pa)
 
-        self.hx = 0.1        # Krok przestrzenny w metrach
+        self.hx = space_step # Krok przestrzenny w metrach
         self.ht = time_step  # Krok czasowy w sekundach
 
         self.lambda_air = self.air_movement_coeff * self.air_heat_coeff
@@ -245,7 +245,7 @@ class Flat:
         self.current_temp = u_current.reshape(self.Ny, self.Nx) #Powrót do kształtu siatki
 
         # Wypisywanie danych
-        average_temp = round(self.average_temp - self.K, 2)
+        average_temp = round(self.average_temp - self.K, 4)
 
         return total_kwh, average_temp
 
