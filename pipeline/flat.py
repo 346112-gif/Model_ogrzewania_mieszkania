@@ -42,9 +42,8 @@ class Flat:
         self.r = data["r"] # Indywidualna stała gazowa dla suchego powietrza (J/(kg*K))
         self.c = data["c"] # Ciepło właściwe powietrza przy stałym ciśnieniu (J/(kg*K))
         self.p = data["p"] # Ciśnienie atmosferyczne (Pa)
-        self.P = data["P"] # Przyjęta moc grzejników (W)
 
-        self.hx = 0.1  # Krok przestrzenny w metrach
+        self.hx = 0.1        # Krok przestrzenny w metrach
         self.ht = time_step  # Krok czasowy w sekundach
 
         self.lambda_air = self.air_movement_coeff * self.air_heat_coeff
@@ -116,9 +115,9 @@ class Flat:
         zachodnia dla pionowego), grubość obiektu, początek i koniec ściany (względem odpowiednio zachodniej
         czy północnej ściany) i współczynnik przenikalności ciepła obiektu.
         """
-        if object_type == "ściana":
+        if object_type == "wall":
             lambda_type = self.lambda_wall
-        elif object_type == "drzwi":
+        elif object_type == "door":
             lambda_type = self.lambda_door
         else:
             raise ValueError("object_type has to be either 'wall' or 'door'")
@@ -139,13 +138,13 @@ class Flat:
         self.A[idx, :] = self.id_Nxy[idx, :] - (self.alfa * ratio * self.ht * self.laplacian)[idx, :]
 
 
-    def add_radiator(self, placement, thickness, start, end, dist_from_wall):
+    def add_radiator(self, placement, thickness, start, end, dist_from_wall, power):
         """
         Funkcja dodająca grzejnik do siatki. Te same parametry co w 'add_inner_object'.
-        Używa też stałych z zewnątrz potrzebnych do wyznaczenia ilości ciepła.
+        Używa też podanej mocy i stałych z zewnątrz potrzebnych do wyznaczenia ilości ciepła.
         """
         area = thickness * (end - start)
-        heat_gain = self.ht * self.P * self.r/ (self.p * self.c * area)
+        heat_gain = self.ht * power * self.r/ (self.p * self.c * area)
 
         if placement == "vertical":
             M = (self.X == self.x[int(dist_from_wall / self.hx)]) & (self.Y >= start) & (self.Y <= end)
@@ -211,7 +210,7 @@ class Flat:
         cell_area = self.hx ** 2           # Powierzchnia jednej komórki na siatce
         cell_mass = self.rho * cell_area   # Masa jednej komórki na siatce
 
-        heating = 1  # Parametr do symulacji działania termostatu
+        heating = 0  # Parametr do symulacji działania termostatu
 
         for _ in range(int(T/self.ht)):
             # Stałe temperatry na zewnątrz mieszkania
@@ -221,7 +220,7 @@ class Flat:
             u_current[self.idx_west_wall] = self.west_out_temp
 
             can_heat = (u_current < 70 + self.K)  # Temperatura wody w grzejnikach
-                                             # nie przekracza 70 stopni Celsjusza
+                                                  # nie przekracza 70 stopni Celsjusza
 
             # Ciepło dodawane do komórek grzejników na siatce
             heat_added = self.heat_sources * (self.radiators_heat_level / 5) * can_heat * heating
@@ -251,9 +250,6 @@ class Flat:
         return total_kwh, average_temp
 
 
-    def reset_heat(self):
-        self.current_temp = np.ones(self.X.shape) * self.init_temp
-        self.average_temp = self.init_temp
 
 
     def temp_plot(self):
@@ -274,4 +270,5 @@ class Flat:
         plt.gca().invert_yaxis() # odwracamy pionową oś, bo dla macierzy punkt
                                  # (0, 0) jest u góry po lewej
         plt.show()
+
 
