@@ -15,15 +15,15 @@ Główne cele projektu to:
 
 Folder zawiera serię skryptów .py, czyli logikę biznesową projektu:
 
--flat.py: Definiuje klasę Flat, która odpowiada za inicjalizację siatki, ustawienie warunków brzegowych (okna, drzwi, grzejniki) oraz wykonywanie kroków czasowych symulacji.
--Diff_matrices.py: Zawiera funkcje tworzące macierze niezbędne do obliczania drugiej pochodnej po zmiennych przestrzennych.
--load_constants.py: Skrypt obsługujący poprawne wczytywanie stałych fizycznych ze ścieżek systemowych.
+- flat.py: Definiuje klasę Flat, która odpowiada za inicjalizację siatki, ustawienie warunków brzegowych (okna, drzwi, grzejniki) oraz wykonywanie kroków czasowych symulacji. \
+- Diff_matrices.py: Zawiera funkcje tworzące macierze niezbędne do obliczania drugiej pochodnej po zmiennych przestrzennych. \
+- load_constants.py: Skrypt obsługujący poprawne wczytywanie stałych fizycznych ze ścieżek systemowych.
 
 ### notebooks/
 
 Folder zawiera notatniki Jupyter (.ipynb), które służą do przeprowadzania eksperymentów i wizualizacji wyników. Znajdują się tu wykresy temperatury w czasie oraz analizy zużycia energii dla różnych ustawień grzania grzejników.
 
-###data/constants.csv
+### data/constants.csv
 
 Plik konfiguracyjny zawierający stałe takie jak: współczynniki przewodnictwa ($\lambda$), ciepło właściwe, gęstość powietrza. 
 
@@ -31,13 +31,13 @@ Plik konfiguracyjny zawierający stałe takie jak: współczynniki przewodnictwa
 
 Aby uruchomić projekt na lokalnej maszynie, wykonaj poniższe kroki:
 
-1.Sklonuj repozytorium: \
-Bashgit clone [https://github.com/TwojLogin/Projekt_mod_det_JK.git](https://github.com/TwojLogin/Projekt_mod_det_JK.git)
+1. Sklonuj repozytorium: \
+Bashgit clone [https://github.com/TwojLogin/Projekt_mod_det_JK.git](https://github.com/TwojLogin/Projekt_mod_det_JK.git) \
 cd Projekt_mod_det_JK
 
-2. Zainstaluj wymagane zależności:\
+2. Zainstaluj wymagane zależności: \
 Upewnij się, że masz zainstalowanego Pythona. Następnie zainstaluj biblioteki z pliku requirements.txt:\
 pip install -r requirements.txt
 
-3. Uruchom symulacje:\
+3. Uruchom symulacje: \
 Najlepszym sposobem na przeglądanie wyników jest uruchomienie serwera Jupyter Notebook. W przeglądarce wejdź do folderu notebooks/ i wybierz interesujący Cię eksperyment.
